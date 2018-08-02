@@ -1,8 +1,9 @@
 
-// Resource usage recoderDlg.h : 头文件
+// ResourceUsageRecoderDlg.h : 头文件
 //
 
-#pragma once
+#ifndef _RESOURCEUSAGE_RECODER_H
+#define _RESOURCEUSAGE_RECODER_H
 
 #include "ChartCtrl.h"
 #include "ChartLineSerie.h"
@@ -13,6 +14,7 @@
 #include "TipsDlg.h"
 #include "PictureEx.h"
 #include "CpuUsage.h"
+#include "ProcessResourceStatistics.h"
 
 #define TIMER_SAMPLING_MSG WM_USER+1
 
@@ -26,14 +28,8 @@ public:
 // 对话框数据
 	enum { IDD = IDD_RESOURCEUSAGERECODER_DIALOG };
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
-
-private:
-	double GetCPUInfoByPid(int pid);
-    double GetMemoryInfoByPid(int pid);
-	double GetHandleInfoByPid(int pid);
-	double GetThreadInfoByPid(int pid);
 
 // 实现
 protected:
@@ -41,6 +37,7 @@ protected:
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
@@ -60,9 +57,7 @@ private:
 	CChartDialog* m_pChartCtrlNonpaged; //非页面缓冲池
     UINT m_iSampRateSecond;             //TIMER间隔 / 数据采集间隔
 
-	//CpuUsage* m_pCPUAgent;
-	CPUusage* m_pCPUAgent;
-
+	ProcessResourceStatistics* m_pProcessResStatistics;//资源统计对象指针
 public:
     afx_msg void OnClose();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
@@ -70,3 +65,5 @@ public:
 	afx_msg void OnBnClickedBtnRecode();
 	afx_msg void OnBnClickedBtnStop();
 };
+
+#endif //_RESOURCEUSAGE_RECODER_H

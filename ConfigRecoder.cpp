@@ -20,7 +20,6 @@ CConfigRecoder::CConfigRecoder(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CConfigRecoder::IDD, pParent),
     m_listctrl_index(0)
 {
-
 }
 
 CConfigRecoder::~CConfigRecoder()
@@ -39,32 +38,32 @@ void CConfigRecoder::GetConfig(RecoderInfo* info)
     info->iCheck = 0x0;
     if (m_ck_mem.GetCheck())
     {
-        info->iCheck = info->iCheck | 0x1;
+        info->iCheck = info->iCheck | RESTYPE_MEM;
     }
 
     if (m_ck_cpu.GetCheck())
     {
-        info->iCheck = info->iCheck | 0x2;
+        info->iCheck = info->iCheck | RESTYPE_CPU;
     }
 
     if (m_ck_handle.GetCheck())
     {
-        info->iCheck = info->iCheck | 0x4;
+        info->iCheck = info->iCheck | RESTYPE_HANDLE;
     }
 
-    if (m_ck_thead.GetCheck())
+    if (m_ck_thread.GetCheck())
     {
-        info->iCheck = info->iCheck | 0x8;
+        info->iCheck = info->iCheck | RESTYPE_THREAD;
     }
 
     if (m_ck_io.GetCheck())
     {
-        info->iCheck = info->iCheck | 0x10;
+        info->iCheck = info->iCheck | RESTYPE_IO;
     }
 
     if (m_ck_Nonpaged.GetCheck())
     {
-        info->iCheck = info->iCheck | 0x20;
+        info->iCheck = info->iCheck | RESTYPE_NONP;
     }
 
     //
@@ -99,7 +98,7 @@ void CConfigRecoder::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CK_MEM, m_ck_mem);
 	DDX_Control(pDX, IDC_CK_CPU, m_ck_cpu);
 	DDX_Control(pDX, IDC_CK_HANDLE, m_ck_handle);
-	DDX_Control(pDX, IDC_CK_THREAD, m_ck_thead);
+	DDX_Control(pDX, IDC_CK_THREAD, m_ck_thread);
 	DDX_Control(pDX, IDC_CK_IO, m_ck_io);
 	DDX_Control(pDX, IDC_CK_NOD, m_ck_Nonpaged);
 	DDX_Control(pDX, IDC_CK_SAVE, m_ck_save);
@@ -136,7 +135,7 @@ BOOL CConfigRecoder::OnInitDialog()
     m_listctrl.SetBkColor(RGB(255, 255, 255));
     m_listctrl.InsertColumn(0, _T("Name"), LVCFMT_LEFT, 160);
     m_listctrl.InsertColumn(1, _T("PID"), LVCFMT_LEFT, 50);
-    m_listctrl.InsertColumn(2, _T("File Path"), LVCFMT_LEFT, 300);
+    m_listctrl.InsertColumn(2, _T("File Path"), LVCFMT_LEFT, 600);
     GetAllProcess();
 
     //初始化编辑框
@@ -151,7 +150,14 @@ BOOL CConfigRecoder::OnInitDialog()
 	// 异常:  OCX 属性页应返回 FALSE
 }
 
-
+BOOL CConfigRecoder::PreTranslateMessage(MSG* pMsg)
+{
+	//屏蔽ESC Enter关闭窗体
+	if (pMsg->message == WM_KEYDOWN && (pMsg->wParam == VK_ESCAPE || pMsg->wParam == VK_RETURN))
+		return TRUE;
+	else
+		return CDialogEx::PreTranslateMessage(pMsg);
+}
 
 void CConfigRecoder::OnPaint()
 {
@@ -245,6 +251,10 @@ void CConfigRecoder::GetAllProcess()
             CloseHandle(hProcess);
         }
     }
+
+	//默认按第一个排序
+	SortListCtrl(0);
+
     return;
 }
 
@@ -279,6 +289,9 @@ void CConfigRecoder::GetAllProcess_V2()
         }
     }
     CloseHandle(hSnapshort);
+
+	//默认按第一个排序
+	SortListCtrl(0);
 }
 
 

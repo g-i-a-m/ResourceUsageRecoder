@@ -153,6 +153,9 @@
     <ClInclude Include="CpuUsage.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ProcessResourceStatistics.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -254,6 +257,9 @@
     <ClCompile Include="CpuUsage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ProcessResourceStatistics.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ChartCtrl\ChartBalloonLabel.inl">
@@ -280,6 +286,9 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="res\006.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\main.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

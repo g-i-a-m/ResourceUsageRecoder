@@ -93,6 +93,15 @@ BOOL CChartDialog::OnInitDialog()
 	// 异常:  OCX 属性页应返回 FALSE
 }
 
+BOOL CChartDialog::PreTranslateMessage(MSG* pMsg)
+{
+	//屏蔽ESC Enter关闭窗体
+	if (pMsg->message == WM_KEYDOWN && (pMsg->wParam == VK_ESCAPE || pMsg->wParam == VK_RETURN))
+		return TRUE;
+	else
+		return CDialogEx::PreTranslateMessage(pMsg);
+}
+
 afx_msg LRESULT CChartDialog::OnAddDataToChart(WPARAM wParam, LPARAM lParam)
 {
 	if (lParam!=NULL)

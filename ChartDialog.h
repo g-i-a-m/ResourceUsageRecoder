@@ -77,5 +77,6 @@ protected:
 
 public:
 	virtual BOOL OnInitDialog();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg LRESULT OnAddDataToChart(WPARAM wParam, LPARAM lParam);
 };

@@ -6,9 +6,7 @@
 #include "ResourceUsageRecoder.h"
 #include "ResourceUsageRecoderDlg.h"
 #include "afxdialogex.h"
-
-#include <psapi.h>
-#pragma comment(lib,"Psapi.lib")
+#include <stdio.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -26,9 +24,10 @@ CResourceUsageRecoderDlg::CResourceUsageRecoderDlg(CWnd* pParent /*=NULL*/)
 	m_pChartCtrlHandle(NULL),
 	m_pChartCtrlThread(NULL),
     m_pChartCtrlIO(NULL),
-	m_pChartCtrlNonpaged(NULL)
+	m_pChartCtrlNonpaged(NULL),
+	m_pProcessResStatistics(NULL)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICO_MAIN);
 }
 
 void CResourceUsageRecoderDlg::DoDataExchange(CDataExchange* pDX)
@@ -90,6 +89,15 @@ BOOL CResourceUsageRecoderDlg::OnInitDialog()
 	}
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+}
+
+BOOL CResourceUsageRecoderDlg::PreTranslateMessage(MSG* pMsg)
+{
+	//屏蔽ESC关闭窗体
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
+		return TRUE;
+	else
+		return CDialogEx::PreTranslateMessage(pMsg);
 }
 
 // 如果向对话框添加最小化按钮，则需要下面的代码
@@ -157,22 +165,35 @@ void CResourceUsageRecoderDlg::OnTimer(UINT_PTR nIDEvent)
 			//double Y = Fibonacci(m_iCount++);
 			static int g_iCount = 0;
 			double Y = ((g_iCount % 5) == 0) ? (g_iCount++)*1.6 : (g_iCount++)*1.15;
-            
-			if (m_pChartCtrlCPU != NULL && m_pCPUAgent != NULL)
+			if (m_pProcessResStatistics!=NULL && (m_pProcessResStatistics->IsRunning() == -1))
 			{
-				double cpuUsageRate = GetCPUInfoByPid(m_info.iPID);
+				KillTimer(TIMER_SAMPLING_MSG);
+
+				/*SYSTEMTIME time;
+				GetLocalTime(&time);
+				TCHAR szTips[128] = {0};
+				_sntprintf(szTips,127,_T("%d-%02d-%02d %02d:%02d:%02d进程已终止"), time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond);*/
+				CTipsDlg tips;
+				tips.SetTips(_T("进程已终止"), BTNTYPE_ONLYOK);
+				tips.DoModal();
+				return;
+			}
+
+			if (m_pChartCtrlCPU != NULL)
+			{
+				double cpuUsageRate = m_pProcessResStatistics->GetCPUInfo();
 				::PostMessage(m_pChartCtrlCPU->GetSafeHwnd(), WM_USER_ADDDATA, NULL, cpuUsageRate);
 			}
 
 			if (m_pChartCtrlMemoy != NULL)
 			{
-				double memNum = GetMemoryInfoByPid(m_info.iPID);
+				double memNum = m_pProcessResStatistics->GetMemoryInfo();
 				::PostMessage(m_pChartCtrlMemoy->GetSafeHwnd(), WM_USER_ADDDATA, NULL, memNum);
 			}
 
 			if (m_pChartCtrlHandle != NULL)
 			{
-				double handleNum = GetHandleInfoByPid(m_info.iPID);
+				double handleNum = m_pProcessResStatistics->GetHandleInfo();
 				::PostMessage(m_pChartCtrlHandle->GetSafeHwnd(), WM_USER_ADDDATA, NULL, handleNum);
 			}
 
@@ -221,13 +242,20 @@ void CResourceUsageRecoderDlg::OnBnClickedBtnRecode()
         if (m_pConfigRecoderDlg != NULL)
             m_pConfigRecoderDlg->ShowWindow(SW_HIDE);
 
+		m_pProcessResStatistics = new ProcessResourceStatistics(m_info.iPID);
+		if (m_pProcessResStatistics == NULL)
+		{
+			CTipsDlg tips;
+			tips.SetTips(_T("太不走运了无法统计资源,请退出"), BTNTYPE_ONLYOK);
+			tips.DoModal();
+			return;
+		}
+
         //创建并加载报表子窗口
         int iCount = 0;
         int iWidth(0), iHeight(0);
         if (m_info.iCheck & RESTYPE_CPU)
         {
-			//m_pCPUAgent = new CpuUsage(m_info.iPID);
-			m_pCPUAgent = new CPUusage(m_info.iPID);
             m_pChartCtrlCPU = new CChartDialog();
             TCHAR title[64] = { 0 };
             _swprintf_p(title,63,_T("%s-%d cpu usage recoder"), m_info.strName.c_str(), m_info.iPID);
@@ -341,7 +369,7 @@ void CResourceUsageRecoderDlg::OnBnClickedBtnRecode()
             //调整GIF位置
             CRect rect_gif;
             m_picGif.GetWindowRect(&rect_gif);
-            m_picGif.MoveWindow(iiWidth - rect_gif.Width(), iiHeight + 65 - rect_gif.Height(), rect_gif.Width(), rect_gif.Height());
+            m_picGif.MoveWindow(iiWidth - rect_gif.Width(), iiHeight + 68 - rect_gif.Height(), rect_gif.Width(), rect_gif.Height());
 
             //开启定时器
             m_iSampRateSecond = 1000 * m_info.iSampRate * ((m_info.iSampRateUnit == 0) ? 1 : 60);
@@ -360,31 +388,3 @@ void CResourceUsageRecoderDlg::OnBnClickedBtnStop()
 	KillTimer(TIMER_SAMPLING_MSG);
 }
 
-double CResourceUsageRecoderDlg::GetCPUInfoByPid(int pid)
-{
-	float usageRate = m_pCPUAgent->get_cpu_usage();
-    return (double)usageRate;
-}
-
-double CResourceUsageRecoderDlg::GetMemoryInfoByPid(int pid)
-{
-    double memMB = 0;
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-    PROCESS_MEMORY_COUNTERS pmc;
-    ::GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc));
-    memMB = pmc.WorkingSetSize / 1024.00 / 1024.00;//MByte
-    return memMB;
-}
-
-double CResourceUsageRecoderDlg::GetHandleInfoByPid(int pid)
-{
-	DWORD dwHandleCount;
-	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-	GetProcessHandleCount(hProcess, &dwHandleCount);
-	return (double)dwHandleCount;
-}
-
-double CResourceUsageRecoderDlg::GetThreadInfoByPid(int pid)
-{
-	return 0.0;
-}

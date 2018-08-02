@@ -141,6 +141,7 @@
     <ClInclude Include="ConfigRecoder.h" />
     <ClInclude Include="CpuUsage.h" />
     <ClInclude Include="PictureEx.h" />
+    <ClInclude Include="ProcessResourceStatistics.h" />
     <ClInclude Include="ResourceUsageRecoder.h" />
     <ClInclude Include="ResourceUsageRecoderDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -178,6 +179,7 @@
     <ClCompile Include="ConfigRecoder.cpp" />
     <ClCompile Include="CpuUsage.cpp" />
     <ClCompile Include="PictureEx.cpp" />
+    <ClCompile Include="ProcessResourceStatistics.cpp" />
     <ClCompile Include="ResourceUsageRecoder.cpp" />
     <ClCompile Include="ResourceUsageRecoderDlg.cpp" />
     <ClCompile Include="sqlite\shell.c">
@@ -203,6 +205,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\006.bmp" />
+    <Image Include="res\main.ico" />
     <Image Include="res\nonono.gif" />
     <Image Include="res\ResourceUsageRecoder.ico" />
   </ItemGroup>

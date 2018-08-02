@@ -68,7 +68,7 @@ public:
 	CButton m_ck_mem;
 	CButton m_ck_cpu;
 	CButton m_ck_handle;
-	CButton m_ck_thead;
+	CButton m_ck_thread;
 	CButton m_ck_io;
 	CButton m_ck_Nonpaged;
 	CButton m_ck_save;
@@ -80,7 +80,8 @@ public:
 	static bool fav;
 
 	virtual BOOL OnInitDialog();
-	
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
 	afx_msg void OnPaint();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
     afx_msg void OnLvnColumnclickListProcess(NMHDR *pNMHDR, LRESULT *pResult);
