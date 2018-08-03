@@ -270,7 +270,7 @@ void CConfigRecoder::GetAllProcess()
     //设置列表头排序字段的图标
     HDITEM hDi = { HDI_FORMAT | HDI_IMAGE };
     m_pListctrlHeader->GetItem(0, &hDi);
-    hDi.fmt |= HDF_IMAGE;
+    hDi.fmt |= HDF_IMAGE | HDF_BITMAP_ON_RIGHT;
     hDi.iImage = 0;
     m_pListctrlHeader->SetItem(0, &hDi);
 }
@@ -315,7 +315,7 @@ void CConfigRecoder::GetAllProcess_V2()
     //设置列表头排序字段的图标
     HDITEM hDi = { HDI_FORMAT | HDI_IMAGE };
     m_pListctrlHeader->GetItem(0, &hDi);
-    hDi.fmt |= HDF_IMAGE;
+    hDi.fmt |= HDF_IMAGE | HDF_BITMAP_ON_RIGHT;
     hDi.iImage = 0;
     m_pListctrlHeader->SetItem(0, &hDi);
 }
@@ -440,14 +440,16 @@ void CConfigRecoder::OnLvnColumnclickListProcess(NMHDR *pNMHDR, LRESULT *pResult
         if (m_iCol >= 0)//删除之前排序表头字段图标
         {
             m_pListctrlHeader->GetItem(m_iCol, &hDi);
+            hDi.mask = HDI_FORMAT;
             hDi.fmt &= (~HDF_IMAGE);
+            //hDi.fmt &= ~HDF_IMAGE & ~HDF_BITMAP_ON_RIGHT;
             m_pListctrlHeader->SetItem(m_iCol, &hDi);
         }
 
         //显示新图标
         m_iCol = nCol;
         m_pListctrlHeader->GetItem(m_iCol, &hDi);
-        hDi.fmt |= HDF_IMAGE;
+        hDi.fmt |= HDF_IMAGE | HDF_BITMAP_ON_RIGHT;
         if (m_iCol == 0 || m_iCol == 2)//进程名列或者路径列
         {
             hDi.iImage = 0;//与上次排序是不同字段,则本字段排序按降序
@@ -462,7 +464,7 @@ void CConfigRecoder::OnLvnColumnclickListProcess(NMHDR *pNMHDR, LRESULT *pResult
     else
     {
         m_pListctrlHeader->GetItem(nCol, &hDi);
-        hDi.fmt |= HDF_IMAGE;
+        hDi.fmt |= HDF_IMAGE | HDF_BITMAP_ON_RIGHT;
         if (m_iCol == 0 || m_iCol == 2)//进程名列或者路径列
         {
             if (m_iCurrSortType == 0)
