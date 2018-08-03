@@ -222,12 +222,12 @@ bool CConfigRecoder::raisePrivilege()
 
 void CConfigRecoder::GetAllProcess()
 {
-	/*if (!raisePrivilege())
+	if (!raisePrivilege())
 	{
 		CTipsDlg tips;
 		tips.SetTips(_T("Ã·…˝»®œﬁ ß∞‹"));
 		tips.DoModal();
-	}*/
+	}
 
     DWORD aProcesses[1024], cbNeeded;
     if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded))
