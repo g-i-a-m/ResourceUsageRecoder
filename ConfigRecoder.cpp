@@ -12,7 +12,7 @@
 
 // CConfigRecoder 对话框
 
-bool CConfigRecoder::fav = false;
+int CConfigRecoder::m_iSortType = false;
 
 IMPLEMENT_DYNAMIC(CConfigRecoder, CDialogEx)
 
@@ -133,9 +133,19 @@ BOOL CConfigRecoder::OnInitDialog()
     //初始化进程列表
     m_listctrl.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_FULLROWSELECT);
     m_listctrl.SetBkColor(RGB(255, 255, 255));
-    m_listctrl.InsertColumn(0, _T("Name"), LVCFMT_LEFT, 160);
-    m_listctrl.InsertColumn(1, _T("PID"), LVCFMT_LEFT, 50);
+    m_listctrl.InsertColumn(0, _T("Name"), LVCFMT_LEFT, 150);
+    m_listctrl.InsertColumn(1, _T("PID"), LVCFMT_LEFT, 60);
     m_listctrl.InsertColumn(2, _T("File Path"), LVCFMT_LEFT, 600);
+
+    //列表表头排序图标
+    m_pListctrlHeader = m_listctrl.GetHeaderCtrl();
+    m_ImageList.Create(16, 16, ILC_COLOR16 | ILC_MASK, 0, 4);
+    m_ImageList.Add(AfxGetApp()->LoadIcon(IDI_ICO_SORT_AZ));
+    m_ImageList.Add(AfxGetApp()->LoadIcon(IDI_ICO_SORT_ZA));
+    m_ImageList.Add(AfxGetApp()->LoadIcon(IDI_ICO_SORT_19));
+    m_ImageList.Add(AfxGetApp()->LoadIcon(IDI_ICO_SORT_91));
+    m_pListctrlHeader->SetImageList(&m_ImageList);
+
     GetAllProcess();
 
     //初始化编辑框
@@ -252,10 +262,17 @@ void CConfigRecoder::GetAllProcess()
         }
     }
 
-	//默认按第一个排序
-	SortListCtrl(0);
+	// 排序
+    m_iCol = 0;//第0列
+    m_iCurrSortType = 1;//从上到下降序排列
+	SortListCtrl(m_iCol, m_iCurrSortType);
 
-    return;
+    //设置列表头排序字段的图标
+    HDITEM hDi = { HDI_FORMAT | HDI_IMAGE };
+    m_pListctrlHeader->GetItem(0, &hDi);
+    hDi.fmt |= HDF_IMAGE;
+    hDi.iImage = 0;
+    m_pListctrlHeader->SetItem(0, &hDi);
 }
 
 void CConfigRecoder::GetAllProcess_V2()
@@ -290,8 +307,17 @@ void CConfigRecoder::GetAllProcess_V2()
     }
     CloseHandle(hSnapshort);
 
-	//默认按第一个排序
-	SortListCtrl(0);
+    // 排序
+    m_iCol = 0;//第0列
+    m_iCurrSortType = 1;//从上到下降序排列
+    SortListCtrl(m_iCol, m_iCurrSortType);
+
+    //设置列表头排序字段的图标
+    HDITEM hDi = { HDI_FORMAT | HDI_IMAGE };
+    m_pListctrlHeader->GetItem(0, &hDi);
+    hDi.fmt |= HDF_IMAGE;
+    hDi.iImage = 0;
+    m_pListctrlHeader->SetItem(0, &hDi);
 }
 
 
@@ -348,7 +374,7 @@ int CConfigRecoder::listCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSor
         CString strRow2 = plist->GetItemText(lParam2, col);
         int n1 = _ttoi(strRow1);
         int n2 = _ttoi(strRow2);
-        if (fav)
+        if (m_iSortType ==1)
         {
             // 比较两个数 如果返回-1表示n1排在n2前面，如果返回1表示n1排在n2后面，如果相等返回0，这里没有判断相等的情况
             if (n1 < n2)
@@ -373,7 +399,7 @@ int CConfigRecoder::listCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSor
         CString strItem1 = plist->GetItemText(lParam1, col);
         CString strItem2 = plist->GetItemText(lParam2, col);
         int iRet = 0;
-        if (fav)
+        if (m_iSortType==1)
             iRet = _tcscmp(strItem1.MakeUpper().GetBuffer(MAX_PATH), strItem2.MakeUpper().GetBuffer(MAX_PATH));
         else
             iRet = _tcscmp(strItem2.MakeUpper().GetBuffer(MAX_PATH), strItem1.MakeUpper().GetBuffer(MAX_PATH));
@@ -394,7 +420,8 @@ void CConfigRecoder::SortListCtrl(int subitem, bool bNotChange)
     DATA data;
     data.subitem = subitem;
     data.plist = &m_listctrl;
-    bNotChange ? fav = fav : fav = !fav;
+    //bNotChange ? fav = fav : fav = !fav;
+    m_iSortType = bNotChange;
     m_listctrl.SortItems(listCompare, (LPARAM)&data);
 }
 
@@ -403,7 +430,68 @@ void CConfigRecoder::OnLvnColumnclickListProcess(NMHDR *pNMHDR, LRESULT *pResult
     LPNMLISTVIEW pNMListView = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
     // TODO: 在此添加控件通知处理程序代码
 
-    SortListCtrl(pNMListView->iSubItem);
+    //设置图标
+    int nCol = pNMListView->iSubItem;
+    HDITEM hDi = { HDI_FORMAT | HDI_IMAGE };
+    if (nCol != m_iCol)
+    {
+        if (m_iCol >= 0)//删除之前排序表头字段图标
+        {
+            m_pListctrlHeader->GetItem(m_iCol, &hDi);
+            hDi.fmt &= ~HDF_IMAGE;
+            m_pListctrlHeader->SetItem(m_iCol, &hDi);
+        }
+
+        //显示新图标
+        m_iCol = nCol;
+        m_pListctrlHeader->GetItem(m_iCol, &hDi);
+        hDi.fmt |= HDF_IMAGE;
+        if (m_iCol == 0 || m_iCol == 2)//进程名列或者路径列
+        {
+            hDi.iImage = 0;//与上次排序是不同字段,则本字段排序按降序
+        }
+        else if (m_iCol == 1)//PID列
+        {
+            hDi.iImage = 2;//与上次排序是不同字段,则本字段排序按降序
+        }
+        m_iCurrSortType == 1;
+        m_pListctrlHeader->SetItem(m_iCol, &hDi);
+    }
+    else
+    {
+        m_pListctrlHeader->GetItem(nCol, &hDi);
+        hDi.fmt |= HDF_IMAGE;
+        if (m_iCol == 0 || m_iCol == 2)//进程名列或者路径列
+        {
+            if (m_iCurrSortType == 0)
+            {
+                hDi.iImage = 0;
+                m_iCurrSortType = 1;
+            }
+            else
+            {
+                hDi.iImage = 1;
+                m_iCurrSortType = 0;
+            }
+        }
+        else if (m_iCol == 1)//PID列
+        {
+            if (m_iCurrSortType == 0)
+            {
+                hDi.iImage = 2;
+                m_iCurrSortType = 1;
+            }
+            else
+            {
+                hDi.iImage = 3;
+                m_iCurrSortType = 0;
+            }
+        }
+        m_pListctrlHeader->SetItem(nCol, &hDi);
+    }
+
+    SortListCtrl(m_iCol, m_iCurrSortType);
+
     *pResult = 0;
 }
 

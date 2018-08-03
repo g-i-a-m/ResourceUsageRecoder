@@ -291,6 +291,18 @@
     <Image Include="res\main.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\sort_az.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\sort_za.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\sort_19.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\sort_91.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ResourceUsageRecoder.rc">

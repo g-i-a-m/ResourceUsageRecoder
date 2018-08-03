@@ -65,6 +65,11 @@ protected:
 
 public:
 	CListCtrl m_listctrl;
+    CHeaderCtrl *m_pListctrlHeader;
+    CImageList m_ImageList;
+    int m_iCol;
+    int m_iCurrSortType;// 0:½µÐò 1:ÉýÐò
+
 	CButton m_ck_mem;
 	CButton m_ck_cpu;
 	CButton m_ck_handle;
@@ -77,7 +82,7 @@ public:
 
 	CBrush m_brush;
     int m_listctrl_index;
-	static bool fav;
+	static int m_iSortType;
 
 	virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

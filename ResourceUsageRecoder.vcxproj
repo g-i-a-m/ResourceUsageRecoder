@@ -208,6 +208,10 @@
     <Image Include="res\main.ico" />
     <Image Include="res\nonono.gif" />
     <Image Include="res\ResourceUsageRecoder.ico" />
+    <Image Include="res\sort_19.ico" />
+    <Image Include="res\sort_91.ico" />
+    <Image Include="res\sort_az.ico" />
+    <Image Include="res\sort_za.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ResourceUsageRecoder.rc" />
