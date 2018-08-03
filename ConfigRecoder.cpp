@@ -432,13 +432,15 @@ void CConfigRecoder::OnLvnColumnclickListProcess(NMHDR *pNMHDR, LRESULT *pResult
 
     //设置图标
     int nCol = pNMListView->iSubItem;
+    if (nCol == 2)
+        return;
     HDITEM hDi = { HDI_FORMAT | HDI_IMAGE };
     if (nCol != m_iCol)
     {
         if (m_iCol >= 0)//删除之前排序表头字段图标
         {
             m_pListctrlHeader->GetItem(m_iCol, &hDi);
-            hDi.fmt &= ~HDF_IMAGE;
+            hDi.fmt &= (~HDF_IMAGE);
             m_pListctrlHeader->SetItem(m_iCol, &hDi);
         }
 
@@ -454,7 +456,7 @@ void CConfigRecoder::OnLvnColumnclickListProcess(NMHDR *pNMHDR, LRESULT *pResult
         {
             hDi.iImage = 2;//与上次排序是不同字段,则本字段排序按降序
         }
-        m_iCurrSortType == 1;
+        m_iCurrSortType = 1;
         m_pListctrlHeader->SetItem(m_iCol, &hDi);
     }
     else
