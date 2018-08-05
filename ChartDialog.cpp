@@ -5,6 +5,7 @@
 #include "ResourceUsageRecoder.h"
 #include "ChartDialog.h"
 #include "afxdialogex.h"
+#include "ChartAxisLabel.h"
 
 // CChartDialog ¶Ô»°¿ò
 
@@ -25,9 +26,10 @@ CChartDialog::~CChartDialog()
 {
 }
 
-void CChartDialog::SetInitParam(std::wstring title, ENUM_TIME_UNIT unit, const int intervalCount, ENUM_CHART_TYPE charttype)
+void CChartDialog::SetInitParam(std::wstring title, std::wstring leftAxisDes, ENUM_TIME_UNIT unit, const int intervalCount, ENUM_CHART_TYPE charttype)
 {
 	m_strTitle = title;
+	m_strLeftAxisDes = leftAxisDes;
 	m_enum_unit = unit;
 	m_iIntervalCount = intervalCount;
 	m_enum_charttype = charttype;
@@ -146,6 +148,11 @@ void CChartDialog::InitChartCtrl()
 	//m_pLeftAxis->SetMinMax(m_yAxisMin, m_yAxisMax);
     m_pLeftAxis->SetAutoHideScrollBar(true);
     m_pLeftAxis->EnableScrollBar(true);
+	if (!m_strLeftAxisDes.empty())
+	{
+		m_pLeftAxis->GetLabel()->SetColor(RGB(0, 180, 0));
+		m_pLeftAxis->GetLabel()->SetText(m_strLeftAxisDes);
+	}
     //m_pLeftAxis->SetPanZoomEnabled(true);
 
 	m_pLineSeries = m_ChartCtrl.CreateLineSerie();

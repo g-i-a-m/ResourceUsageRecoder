@@ -43,7 +43,7 @@ class CChartDialog : public CDialogEx
 public:
 	CChartDialog(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CChartDialog();
-	void SetInitParam(std::wstring title, ENUM_TIME_UNIT unit = ENUM_TIME_UNIT::_MINUTE, const int intervalCount = 1, \
+	void SetInitParam(std::wstring title, std::wstring leftAxisDes, ENUM_TIME_UNIT unit = ENUM_TIME_UNIT::_MINUTE, const int intervalCount = 1, \
 		ENUM_CHART_TYPE charttype = ENUM_CHART_TYPE::_LINE);
 	void AddDataToChart(double Y);
 // 对话框数据
@@ -51,15 +51,15 @@ public:
 
 private:
 	void InitChartCtrl();
-	COleDateTime GetMaxOleDateTime(COleDateTime& minValue);
 
-private:
 	CChartCtrl m_ChartCtrl;
 	CChartDateTimeAxis* m_pBottomTimeAxis;
 	CChartStandardAxis* m_pLeftAxis;
 	CChartLineSerie* m_pLineSeries;
 
 	std::wstring m_strTitle;
+	std::wstring m_strLeftAxisDes;
+
 	ENUM_TIME_UNIT m_enum_unit;
 	int m_iIntervalCount;
 	ENUM_CHART_TYPE m_enum_charttype;

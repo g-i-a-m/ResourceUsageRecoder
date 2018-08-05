@@ -1,22 +1,29 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ResourceUsageRecoder", "ResourceUsageRecoder.vcxproj", "{EF5F88B1-AED1-412F-9073-3DE60DA16B51}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
 		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{EF5F88B1-AED1-412F-9073-3DE60DA16B51}.Debug|Win32.ActiveCfg = Debug|Win32
 		{EF5F88B1-AED1-412F-9073-3DE60DA16B51}.Debug|Win32.Build.0 = Debug|Win32
+		{EF5F88B1-AED1-412F-9073-3DE60DA16B51}.Debug|x64.ActiveCfg = Debug|Win32
 		{EF5F88B1-AED1-412F-9073-3DE60DA16B51}.Release|Win32.ActiveCfg = Release|Win32
 		{EF5F88B1-AED1-412F-9073-3DE60DA16B51}.Release|Win32.Build.0 = Release|Win32
+		{EF5F88B1-AED1-412F-9073-3DE60DA16B51}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {58C376BD-7A0F-4F5A-8EF5-C4885AE33382}
 	EndGlobalSection
 EndGlobal

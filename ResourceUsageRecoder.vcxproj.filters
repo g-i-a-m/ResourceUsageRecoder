@@ -277,6 +277,8 @@
     <None Include="res\ResourceUsageRecoder.rc2">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="res\modres.exe" />
+    <None Include="Debug\modres.exe" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\nonono.gif">

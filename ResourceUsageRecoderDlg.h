@@ -58,6 +58,7 @@ private:
     UINT m_iSampRateSecond;             //TIMER间隔 / 数据采集间隔
 
 	ProcessResourceStatistics* m_pProcessResStatistics;//资源统计对象指针
+
 public:
     afx_msg void OnClose();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
