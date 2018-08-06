@@ -12,6 +12,56 @@
 #define new DEBUG_NEW
 #endif
 
+// 用于应用程序“关于”菜单项的 CAboutDlg 对话框
+
+class CAboutDlg : public CDialogEx
+{
+public:
+    CAboutDlg();
+
+    // 对话框数据
+#ifdef AFX_DESIGN_TIME
+    enum { IDD = IDD_ABOUTBOX };
+#endif
+
+protected:
+    virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+    virtual BOOL OnInitDialog();
+                                                        // 实现
+protected:
+    DECLARE_MESSAGE_MAP()
+public:
+    CStatic m_static_info1;
+    CStatic m_static_info2;
+    CStatic m_static_info3;
+};
+
+CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
+{
+}
+
+void CAboutDlg::DoDataExchange(CDataExchange* pDX)
+{
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_STATIC_INFO1, m_static_info1);
+    DDX_Control(pDX, IDC_STATIC_INFO2, m_static_info2);
+    DDX_Control(pDX, IDC_STATIC_INFO3, m_static_info3);
+}
+
+BOOL CAboutDlg::OnInitDialog()
+{
+    CDialogEx::OnInitDialog();
+    // TODO:  在此添加额外的初始化
+    m_static_info1.SetWindowText(_T("    本工具的图表部分使用了Cedric Moonen发布在codeproject\
+                                开源社区的开源插件High-speed Charting Control,感谢造的轮子^^"));
+    m_static_info2.SetWindowText(_T(""));
+    m_static_info3.SetWindowText(_T(""));
+
+    return TRUE;  // return TRUE unless you set the focus to a control
+}
+BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+END_MESSAGE_MAP()
+
 // CResourceUsageRecoderDlg 对话框
 
 double Y_AXIS_MIN = 0;
@@ -39,6 +89,7 @@ void CResourceUsageRecoderDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CResourceUsageRecoderDlg, CDialogEx)
+    ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_WM_TIMER()
@@ -67,6 +118,23 @@ BOOL CResourceUsageRecoderDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
+
+    // 将“关于...”菜单项添加到系统菜单中。
+
+    // IDM_ABOUTBOX 必须在系统命令范围内。
+    ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+    ASSERT(IDM_ABOUTBOX < 0xF000);
+
+    CMenu* pSysMenu = GetSystemMenu(FALSE);
+    if (pSysMenu != nullptr)
+    {
+        CString strAboutMenu=_T("关于(&A)...");
+        if (!strAboutMenu.IsEmpty())
+        {
+            pSysMenu->AppendMenu(MF_SEPARATOR);
+            pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+        }
+    }
 
 	// TODO:  在此添加额外的初始化代码
 
@@ -98,6 +166,19 @@ BOOL CResourceUsageRecoderDlg::PreTranslateMessage(MSG* pMsg)
 		return TRUE;
 	else
 		return CDialogEx::PreTranslateMessage(pMsg);
+}
+
+void CResourceUsageRecoderDlg::OnSysCommand(UINT nID, LPARAM lParam)
+{
+    if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+    {
+        CAboutDlg dlgAbout;
+        dlgAbout.DoModal();
+    }
+    else
+    {
+        CDialogEx::OnSysCommand(nID, lParam);
+    }
 }
 
 // 如果向对话框添加最小化按钮，则需要下面的代码
